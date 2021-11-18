@@ -50,7 +50,7 @@ func GetUsers() gin.HandlerFunc {
 			{"$project", bson.D{
 				{"_id", 0},
 				{"total_count", 1},
-				{"user_items", bson.D{{"$slice", []interface{}{"data", startIndex, recordPerPage}}}}}}}
+				{"user_items", bson.D{{"$slice", []interface{}{"$data", startIndex, recordPerPage}}}}}}}
 
 		result, err := userCollection.Aggregate(ctx, mongo.Pipeline{
 			matchStage, groupStage, projectStage})
@@ -61,6 +61,7 @@ func GetUsers() gin.HandlerFunc {
 		var allUsers []bson.M
 		if err = result.All(ctx, &allUsers); err != nil {
 			log.Fatal(err)
+			return
 		}
 		c.JSON(http.StatusOK, allUsers[0])
 	}
